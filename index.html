@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>cMenu - Copyright Gigol.net</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link type="text/css" href="./css/style-light.css" rel="stylesheet" media="all">
+        <script type="text/javascript" src="./jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="./jquery/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="./cmenu/jquery.cmenu.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("#list li").cMenu({
+                    data:[
+                        {
+                            close:true,
+                            header:"Menu Access"
+                        },{
+                            text:'Administrator',
+                            click:function(){
+                                alert($(this).text());
+                            }
+                        },{
+                            text:'Author',
+                            click:function(){
+                                alert($(this).text());
+                            }
+                        },{
+                            text:'Editor',
+                            click:function(){
+                                alert($(this).text());
+                            }
+                        },{
+                            text:'Visitor',
+                            click:function(){
+                                alert($(this).text());
+                            }
+                        },{
+                            text:'Guest',
+                            click:function(){
+                                alert($(this).text());
+                            }
+                        }
+                    ],
+                    before:function(selector, menu){
+
+                    }
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <ul id="list">
+            <li>01</li>
+            <li>02</li>
+            <li>03</li>
+            <li>04</li>
+            <li>05</li>
+        </ul>
+    </body>
+</html>
