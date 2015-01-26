@@ -4,8 +4,8 @@
  * @author : Ilia GUIGOLACHVILI
  * @web : http://gigol.net
  * @plugin : cMenu
- * @version : 1.0.0
- * Last modified : 25/01/2015
+ * @version : 1.1.0
+ * Last modified : 26/01/2015
  */
 (function($){
 
@@ -56,7 +56,7 @@
 
             for (i; i<data.length; i++){
                 //Btn close
-                if (typeof data[i].close !== 'undefined'){
+                if (typeof data[i].closing !== 'undefined'){
                     cM.append('<li id="cmenu-close-' +id+ '" class="cmenu-close" title="Close">CLOSE</li>');
                 }
                 if (typeof data[i].divider !== 'undefined'){
@@ -125,13 +125,26 @@
         /*
         * Close
         */
-        close: function (){
-            var cM = $(".cmenu-dropdown");
+        closing: function(cM){
             cM.fadeOut(this.settings.fadeSpeed, function(){
                 cM.css({display:""}).find(".cmenu-drop-left").removeClass("cmenu-drop-left");
                 if (typeof cM.attr("data") !== 'undefined'){
                     cM.removeClass("cmenu-attach-data-" +cM.attr("data"));
                     cM.attr("data", "");
+                }
+            });
+        },
+
+        /*
+        * Close all
+        */
+        closeAll: function(){
+            var allMenu = $(".cmenu");
+            allMenu.fadeOut(function(){
+                allMenu.css({display:""}).find(".cmenu-drop-left").removeClass("cmenu-drop-left");
+                if (typeof allMenu.attr("data") !== 'undefined'){
+                    allMenu.removeClass("cmenu-attach-data-" +allMenu.attr("data"));
+                    allMenu.attr("data", "");
                 }
             });
         }
@@ -154,7 +167,7 @@
     /*
      * PLUGIN
      */
-    $.fn.cMenu = function(options){
+    $.fn.cMenu = function(action, options){
         var selector = this;
 
         //These are the defaults
@@ -167,80 +180,91 @@
             above                : 'auto',
             preventDoubleContext : true,
             compress             : false,
-            close                : 'html',
-            before               : false
+            closing              : 'html'
         }, options);
-        var _id = _settings.id,
-            _data = _settings.data,
+        var _id        = _settings.id,
+            _data      = _settings.data,
             _fadeSpeed = _settings.fadeSpeed,
-            _above = _settings.above,
+            _above     = _settings.above,
             _draggable = _settings.draggable;
 
         //Set this settings for handlers and methods
-        _handlers.setSettings(_settings);
         _methods.setSettings(_settings);
+        _handlers.setSettings(_settings);
 
-        //Init
-        _methods.init();
+        //Open
+        if (action === "open"){
 
-        //Build
-        var buildMenu = _methods.builderMenu(_id, _data);
-        $("body").append(buildMenu);
+            //Init
+            _methods.init();
 
-        $(selector).on('contextmenu', function(e){
-            e.preventDefault();
-            e.stopPropagation();
+            //Build
+            var cM = _methods.builderMenu(_id, _data);
+            $("body").append(cM);
 
-            var cM = $("#cmenu-" +_id);
+            $(selector).on('contextmenu', function(e){
+                e.preventDefault();
+                e.stopPropagation();
 
-            //Call handler "before" if exist into settings
-            _handlers.before($(this), cM);
+                //Call handler "before" if exist into settings
+                _handlers.before($(this), cM);
 
-            $(".cmenu-dropdown:not(.cmenu-dropdown-sub)").hide();
+                $(".cmenu-dropdown:not(.cmenu-dropdown-sub)").hide();
 
-            //Add this data to menu data and class
-            if (typeof $(this).attr("data") !== 'undefined'){
-                cM.attr("data", $(this).attr("data"));
-                cM.addClass("cmenu-attach-data-" +$(this).attr("data"));
-            }
+                //Add this data to menu data and class
+                if (typeof $(this).attr("data") !== 'undefined'){
+                    cM.attr("data", $(this).attr("data"));
+                    cM.addClass("cmenu-attach-data-" +$(this).attr("data"));
+                }
 
-            if (typeof _above == 'boolean' && _above){
-                cM.addClass("cmenu-dropdown-up").css({
-                    top: e.pageY - 20 - $("#cmenu-"+_id).height(),
-                    left: e.pageX - 13
-                }).fadeIn(_fadeSpeed);
-            }
-            else if (typeof _above == 'string' && _above == 'auto'){
-                cM.removeClass("cmenu-dropdown-up");
-                var autoH = cM.height() + 12;
-                if ((e.pageY + autoH) > $("html").height()){
+                if (typeof _above == 'boolean' && _above){
                     cM.addClass("cmenu-dropdown-up").css({
-                        top: e.pageY - 20 - autoH,
+                        top: e.pageY - 20 - $("#cmenu-"+_id).height(),
                         left: e.pageX - 13
                     }).fadeIn(_fadeSpeed);
                 }
-                else {
-                    cM.css({
-                        top: e.pageY + 10,
-                        left: e.pageX - 13
-                    }).fadeIn(_fadeSpeed);
+                else if (typeof _above == 'string' && _above == 'auto'){
+                    cM.removeClass("cmenu-dropdown-up");
+                    var autoH = cM.height() + 12;
+                    if ((e.pageY + autoH) > $("html").height()){
+                        cM.addClass("cmenu-dropdown-up").css({
+                            top: e.pageY - 20 - autoH,
+                            left: e.pageX - 13
+                        }).fadeIn(_fadeSpeed);
+                    }
+                    else {
+                        cM.css({
+                            top: e.pageY + 10,
+                            left: e.pageX - 13
+                        }).fadeIn(_fadeSpeed);
+                    }
                 }
+            });
+
+            //Dragable
+            if (_draggable){
+                cM.draggable();
             }
-        });
 
-        //Dragable
-        if (_draggable){
-            buildMenu.draggable();
+            //Close
+            $(cM).on('contextmenu', function(){
+                _methods.closing(cM);
+            });
+            $(cM).on('click', "#cmenu-close-" +_id, function(){
+                _methods.closing(cM);
+            });
+
+            return _id;
         }
-
-        //Close
-        $(buildMenu).on('contextmenu', function(){
-            _methods.close();
-        });
-        $(buildMenu).on('click', "#cmenu-close-" +_id, function(){
-            _methods.close();
-        });
+        else if (action === "close"){
+            var id = $(this).closest(".cmenu").attr("id");
+            _methods.closing($("#" +id));
+        }
 
     };
 
+    //Close all menu
+    $.fn.cMenu.close = function(){
+        _methods.closeAll();
+    };
 }(jQuery));
