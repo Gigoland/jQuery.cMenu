@@ -4,13 +4,14 @@
         <title>cMenu - Copyright Gigol.net</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link type="text/css" href="./css/ui/jquery-ui.css" rel="stylesheet" media="all">
         <link type="text/css" href="./css/style-light.css" rel="stylesheet" media="all">
         <script type="text/javascript" src="./jquery/jquery.min.js"></script>
         <script type="text/javascript" src="./jquery/jquery-ui.min.js"></script>
         <script type="text/javascript" src="./cmenu/jquery.cmenu.min.js"></script>
         <script type="text/javascript">
             $(document).ready(function(){
-                $("#list li").cMenu({
+                $("#list li").cMenu("open",{
                     data:[
                         {
                             close:true,
